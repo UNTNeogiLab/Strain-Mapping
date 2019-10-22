@@ -11,8 +11,11 @@ import glob
 from scipy import interpolate
 from scipy import optimize
 from tempfile import TemporaryFile
+import ray
 
+ray.init()
 
+@ray.remote
 def strainfit(phi, a, b, delta, theta):
     return 0.25*(a * np.cos(3*phi- 3*delta) + b * np.cos(2 * theta + phi - 3*delta))**2
 
@@ -21,7 +24,7 @@ def strainfit(phi, a, b, delta, theta):
 filelist = glob.glob('/storage/scratch2/share/pi_an0047/191009/Imaging/2019-10-16/*.npy')
 filelist = sorted(filelist)
 
-x = np.array([np.load(fname) for fname in filelist])
+x = ray.put(np.array([np.load(fname) for fname in filelist]))
 #%%Define Variables
 
 phi = np.arange(0,2*x.shape[0],2)*np.pi/180
@@ -37,7 +40,7 @@ for i in range(x.shape[1]):
     for j in range(x.shape[2]):
         if x[:,i,j].mean() > threshold:
             xx = (x[:,i,j]-np.amin(x[:,i,j]))/np.amax(x[:,i,j]-np.amin(x[:,i,j]))
-            params, params_covariance = optimize.curve_fit(strainfit, phi, xx, maxfev=10000000,
+            params, params_covariance = optimize.curve_fit(strainfit.remote(), phi, xx, maxfev=10000000,
                                                 method='lm')
             paramsimg.append(params)
         else:
