@@ -56,14 +56,14 @@ for a in A:
         paramsarray[a[0],a[1],k] = a[k+2]
 np.save(directory + '/outfile', paramsarray)
 #np.save('outfile', paramsarray)
-outfile = np.load(directory + '/outfile.npy')
 toc = time.time()
+outfile = np.load(directory + '/outfile'+toc+'.npy')
 print(toc - tic)
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
 directory =os.getcwd()
-outfile = np.load(directory + '/outfile.npy')
+outfile = np.load(directory + '/outfile'+toc+'.npy')
 def pplot(paramsarray):
     f , ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,
         sharex=True,sharey=True,dpi=200)
