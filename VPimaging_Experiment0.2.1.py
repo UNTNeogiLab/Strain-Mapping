@@ -176,11 +176,11 @@ def HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
     None.
 
     """
-    if orientation = 'parallel':
+    if orientation == 'parallel':
         sys_offset = 0 * u.degree
         folder = os.mkdir(runfolder + '\\' + 'parallel')
         os.chdir(folder)
-    elif orientation = 'perpendicular':
+    elif orientation == 'perpendicular':
         sys_offset = 45 * u.degree
         folder = os.mkdir(runfolder + '\\' + 'perpendicular')
         os.chdir(folder)
@@ -388,9 +388,9 @@ def Start():
     runfolder, sample = InitializeRunFolder(sample, sample_origin, datefolder)
     HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
                  rotator_bottom, runfolder, step=resolution, exp_time=exp_time)
-    HalfWaveLoop((wavelength, sample, sample_origin, cam, rotator_top,
+    HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
                   rotator_bottom, runfolder, step=resolution,
-                  exp_time=exp_time, orientation='perpendicular'))
+                  exp_time=exp_time, orientation='perpendicular')
     #if tiffsave == True:
      #   TiffSave(runfolder)
     ClusterSync()
