@@ -178,11 +178,13 @@ def HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
     """
     if orientation == 'parallel':
         sys_offset = 0 * u.degree
-        folder = os.mkdir(runfolder + '\\' + 'parallel')
+        folder = runfolder + '\\' + 'parallel'
+        os.mkdir(folder)
         os.chdir(folder)
     elif orientation == 'perpendicular':
         sys_offset = 45 * u.degree
-        folder = os.mkdir(runfolder + '\\' + 'perpendicular')
+        folder = runfolder + '\\' + 'parallel'
+        os.mkdir(folder)
         os.chdir(folder)
     tick = datetime.now()
     stop = start + stop
