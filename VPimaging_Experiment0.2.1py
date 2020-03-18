@@ -128,9 +128,10 @@ def InitializeInstruments():
     
     return cam, A, B, C
 #%%
-def HalfWaveLoopP(wavelength, sample, sample_origin, cam, rotator_top,
-                 rotator_bottom, start=0, stop=180, step=1, zfill=4,
-                 delay=180, exp_time=10000, circ_pol=None):
+def HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
+                 rotator_bottom, runfolder, start=0, stop=180, step=1, zfill=4,
+                 delay=180, exp_time=10000, circ_pol=None,
+                 orientation='parallel'):
     """
     Main strain-mapping loop. Rotates pre- and post-sample halfwave plates
     in tandem, taking camera images at each polarization step. Also saves
@@ -175,12 +176,21 @@ def HalfWaveLoopP(wavelength, sample, sample_origin, cam, rotator_top,
     None.
 
     """
+    if orientation = 'parallel':
+        sys_offset = 0 * u.degree
+        folder = os.mkdir(runfolder + '\\' + 'parallel')
+        os.chdir(folder)
+    elif orientation = 'perpendicular':
+        sys_offset = 45 * u.degree
+        folder = os.mkdir(runfolder + '\\' + 'perpendicular')
+        os.chdir(folder)
     tick = datetime.now()
     stop = start + stop
     sleep(delay)
+    step = step * 0.5
     for i in tqdm(np.arange(start, stop, step)):
         position = i * step * u.degree
-        position_top = position - rotator_top.offset
+        position_top = position - rotator_top.offset + sys_offset
         position_bottom = position - rotator_bottom.offset
         strpos = str(2 * i)
         padded = strpos.zfill(zfill)
@@ -210,89 +220,8 @@ def HalfWaveLoopP(wavelength, sample, sample_origin, cam, rotator_top,
             print('Circular Polarization: ' + str(circ_pol) + 'deg', file=f)
         else:
             pass
-#%%
-def HalfWaveLoopP(wavelength, sample, sample_origin, cam, rotator_top,
-                 rotator_bottom, start=0, stop=180, step=1, zfill=4,
-                 delay=180, exp_time=10000, circ_pol=None):
-    """
-    Main strain-mapping loop. Rotates pre- and post-sample halfwave plates
-    in tandem, taking camera images at each polarization step. Also saves
-    metadata.txt in the data folder.
+    os.chdir(runfolder)
 
-    Parameters
-    ----------
-    wavelength : numeric
-        Measurement wavelength. Metadata parameter.
-    sample : string
-        Sample name. Metadata parameter.
-    sample_origin : string
-        Where the sample came from. Metadata parameter.
-    cam : object
-        pvam Camera object.
-    rotator_top : object
-        Instrumental K10CR1 object.
-    rotator_bottom : object
-        Instrumental K10CR1 object.
-    start : numeric, optional
-        Polarization range start point. For a calibrated run, set to
-        the desired offset. Must be a positive value.
-    stop : numeric, optional
-        Polarization range stop point. 
-    step : numeric, optional
-        Polarization step size. Lower values yield higher resolution.
-    zfill : numeric, optional
-        Number of zeros to pad the output filenames
-        with. Should be increased for high resolution
-        datasets. The default is 3.
-    delay : numeric, optional
-        The pre-acquisition delay time in seconds.
-        Used to give time to turn off light sources
-        and vacate the lab. The default is 180.
-    exp_time : numeric, optional
-        Camera exposure time in ms. The default is 10000.
-    circ_pol : numeric, optional
-        The circular polarization this run was acquired at. 
-
-    Returns
-    -------
-    None.
-
-    """
-    tick = datetime.now()
-    stop = start + stop
-    sleep(delay)
-    for i in tqdm(np.arange(start, stop, step)):
-        position = i * step * u.degree
-        position_top = position - rotator_top.offset + (45 * u.degree)
-        position_bottom = position - rotator_bottom.offset
-        strpos = str(2 * i)
-        padded = strpos.zfill(zfill)
-        name = 'halfwave' + padded
-        rotator_top.move_to(position_top)
-        rotator_bottom.move_to(position_bottom)
-        rotator_top.wait_for_move()
-        rotator_bottom.wait_for_move()
-        sleep(1)
-        frame = cam.get_frame(exp_time=exp_time)
-        np.save(name, frame, allow_pickle=False)
-    tock = datetime.now()
-    delta = tock - tick
-    wavelength = str(wavelength) + ' nm'
-    with open('metadata.txt', mode='w') as f:
-        print('Start time: ' + str(tick), file=f)
-        print('End time: ' + str(tock), file=f)
-        print('Total Acquisition time: ' + str(delta), file=f)
-        print('Wavelength: ' + str(wavelength), file=f)
-        print('Exposure time: ' + str(exp_time) + 'ms', file=f)
-        print('Sample: ' + str(sample), file=f)
-        print('Sample Origin: ' + str(sample_origin), file=f)
-        print('Polarization range: ' + str(2 * start) +
-              ' to ' + str(2 * stop) + 'deg', file=f)
-        print('Polarization resolution: ' + str(2 * step) + 'deg', file=f)
-        if circ_pol is not None:
-            print('Circular Polarization: ' + str(circ_pol) + 'deg', file=f)
-        else:
-            pass
 #%%
 def ClusterSync():
     """
@@ -457,10 +386,13 @@ def Start():
     rotator_top, rotator_bottom, cp_post = CheckRotators(A,B,C)
     datefolder = InitializeDateFolder()
     runfolder, sample = InitializeRunFolder(sample, sample_origin, datefolder)
-    HalfWaveLoopP(wavelength, sample, sample_origin, cam, rotator_top,
-                 rotator_bottom, step=resolution, exp_time=exp_time)
-    if tiffsave == True:
-        TiffSave(runfolder)
+    HalfWaveLoop(wavelength, sample, sample_origin, cam, rotator_top,
+                 rotator_bottom, runfolder, step=resolution, exp_time=exp_time)
+    HalfWaveLoop((wavelength, sample, sample_origin, cam, rotator_top,
+                  rotator_bottom, runfolder, step=resolution,
+                  exp_time=exp_time, orientation='perpendicular'))
+    #if tiffsave == True:
+     #   TiffSave(runfolder)
     ClusterSync()
 # =============================================================================
 #     if vp == True:
