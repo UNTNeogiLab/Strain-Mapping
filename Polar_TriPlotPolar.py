@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jan  4 16:31:54 2020
+
+@author: briansquires
+"""
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation 
@@ -7,9 +17,9 @@ import hyperspy.api as hs
 
 
 def Polar(xcoord,ycoord, orientation, norm, file):
-
-    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
-                             np.ceil(np.sqrt(s.axes_manager[2].size)), 
+    s = hs.load(file, lazy=True)
+    fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
+                             int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
                              subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
@@ -20,7 +30,7 @@ def Polar(xcoord,ycoord, orientation, norm, file):
         Q = [f for f in s.data[orientation,:,ycoord,xcoord,:]]
         
         axes = axes.ravel()
-        for i in range(axes.size):
+        for i in range(axes.size-1):
             w =  np.arange(780,922,2)
             w = w[i]
             
@@ -43,7 +53,7 @@ def Polar(xcoord,ycoord, orientation, norm, file):
             axes[i].set_title(f'{w}nm')
        
 
-        
+
     [axi.set_rticks([]) for axi in axes.ravel()]
     [axi.set_xticks([0,np.pi/3,2*np.pi/3,np.pi,4*np.pi/3,5*np.pi/3]) for axi in axes.ravel()]
     O = ['Parallel','Perpendicular', 'Parallel \n + \n Perpendicular']
@@ -55,8 +65,8 @@ def Polar(xcoord,ycoord, orientation, norm, file):
     
     
 def TriPolar(xcoord,ycoord):
-    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
-                             np.ceil(np.sqrt(s.axes_manager[2].size)),
+    fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
+                             int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
                              subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
@@ -70,7 +80,7 @@ def TriPolar(xcoord,ycoord):
 
 
     axes = axes.ravel()
-    for i in range(axes.size):
+    for i in range(axes.size-1):
         w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i], color='tab:green')
@@ -92,8 +102,8 @@ def TriPolar(xcoord,ycoord):
     
     
 def TriPolarNorm(xcoord,ycoord):
-    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
-                             np.ceil(np.sqrt(s.axes_manager[2].size)),
+    fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
+                             int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
                              subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
@@ -107,7 +117,7 @@ def TriPolarNorm(xcoord,ycoord):
     S = []
 
     axes = axes.ravel()
-    for i in range(axes.size):
+    for i in range(axes.size-1):
         w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i]/Q[i].max(), color='tab:green')

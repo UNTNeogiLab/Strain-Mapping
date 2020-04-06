@@ -8,6 +8,13 @@ Created on Wed Feb 19 16:09:13 2020
 #%%
     
 
+import sys
+ 
+filename = sys.argv[1] 
+wavstart = sys.argv[2] 
+wavend   = sys.argv[3]
+wavres   = sys.argv[4]
+
 
 def HSLoad(filename,wavstart, wavend, wavres):
     """Loads and saves 5D hyperspy file.
