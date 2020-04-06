@@ -5,19 +5,16 @@ Created on Wed Feb 19 16:09:13 2020
 
 @author: briansquires
 """
-
-
-#%%
-
-"""File Load:
-    Files loaded itteratively if .npy files already exist
-    """
-
 #%%
     
 
 
 def HSLoad(filename,wavstart, wavend, wavres):
+    """Loads and saves 5D hyperspy file.
+    
+    Currently assumes 2deg polarization resolution"""
+    
+    
     import numpy as np
     import matplotlib 
     matplotlib.rcParams["backend"] = "Agg"
