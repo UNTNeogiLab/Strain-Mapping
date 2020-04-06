@@ -1,5 +1,16 @@
-def Polar(xcoord,ycoord, orientation, norm):
-    fig, axes = plt.subplots(6, 6, subplot_kw=dict(projection='polar'), 
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation 
+import hyperspy.api as hs
+#%%
+
+
+
+def Polar(xcoord,ycoord, orientation, norm, file):
+
+    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
+                             np.ceil(np.sqrt(s.axes_manager[2].size)), 
+                             subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
     
@@ -10,7 +21,7 @@ def Polar(xcoord,ycoord, orientation, norm):
         
         axes = axes.ravel()
         for i in range(axes.size):
-            w =  np.arange(780,924,4)
+            w =  np.arange(780,922,2)
             w = w[i]
             
             if norm==False:
@@ -26,7 +37,7 @@ def Polar(xcoord,ycoord, orientation, norm):
         R = [f for f in s.data[1,:,ycoord,xcoord,:]]
         axes = axes.ravel()
         for i in range(axes.size):
-            w =  np.arange(780,924,4)
+            w =  np.arange(780,922,2)
             w = w[i]
             axes[i].plot(theta,Q[i]+R[i])
             axes[i].set_title(f'{w}nm')
@@ -44,7 +55,9 @@ def Polar(xcoord,ycoord, orientation, norm):
     
     
 def TriPolar(xcoord,ycoord):
-    fig, axes = plt.subplots(6, 6, subplot_kw=dict(projection='polar'), 
+    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
+                             np.ceil(np.sqrt(s.axes_manager[2].size)),
+                             subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
     
@@ -58,12 +71,12 @@ def TriPolar(xcoord,ycoord):
 
     axes = axes.ravel()
     for i in range(axes.size):
-        w =  np.arange(780,924,4)
+        w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i], color='tab:green')
         l2, = axes[i].plot(theta,R[i], color='tab:blue')
         l3, = axes[i].plot(theta,Q[i]+R[i], color='tab:red')
-
+        axes[i].set_title(f'{w}nm')
     fig.legend((l1, l2,l3), (r'$\parallel$', r'$\perp$',r'$\parallel + \perp$'),
                'upper left',prop={'size': 15})
        
@@ -79,7 +92,9 @@ def TriPolar(xcoord,ycoord):
     
     
 def TriPolarNorm(xcoord,ycoord):
-    fig, axes = plt.subplots(6, 6, subplot_kw=dict(projection='polar'), 
+    fig, axes = plt.subplots(np.floor(np.sqrt(s.axes_manager[2].size)), 
+                             np.ceil(np.sqrt(s.axes_manager[2].size)),
+                             subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
     
@@ -93,7 +108,7 @@ def TriPolarNorm(xcoord,ycoord):
 
     axes = axes.ravel()
     for i in range(axes.size):
-        w =  np.arange(780,924,4)
+        w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i]/Q[i].max(), color='tab:green')
         l2, = axes[i].plot(theta,R[i]/R[i].max(), color='tab:blue')

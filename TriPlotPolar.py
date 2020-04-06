@@ -1,6 +1,9 @@
-    
+import numpy as np
+import matplotlib.pyplot as plt
+import hyperspy.api as hs
+
 def TriPolar(xcoord,ycoord):
-    fig, axes = plt.subplots(6, 6, subplot_kw=dict(projection='polar'), 
+    fig, axes = plt.subplots(8, 9, subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
     
@@ -14,7 +17,7 @@ def TriPolar(xcoord,ycoord):
 
     axes = axes.ravel()
     for i in range(axes.size):
-        w =  np.arange(780,924,4)
+        w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i], color='tab:green')
         l2, = axes[i].plot(theta,R[i], color='tab:blue')
@@ -35,7 +38,7 @@ def TriPolar(xcoord,ycoord):
     
     
 def TriPolarNorm(xcoord,ycoord):
-    fig, axes = plt.subplots(6, 6, subplot_kw=dict(projection='polar'), 
+    fig, axes = plt.subplots(8, 9, subplot_kw=dict(projection='polar'), 
                              sharex='all', sharey='all',
                              tight_layout=True)
     
@@ -49,7 +52,7 @@ def TriPolarNorm(xcoord,ycoord):
 
     axes = axes.ravel()
     for i in range(axes.size):
-        w =  np.arange(780,924,4)
+        w =  np.arange(780,922,2)
         w = w[i]
         l1, = axes[i].plot(theta,Q[i]/Q[i].max(), color='tab:green')
         l2, = axes[i].plot(theta,R[i]/R[i].max(), color='tab:blue')
