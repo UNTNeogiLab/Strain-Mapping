@@ -77,7 +77,8 @@ def TriPolar(xcoord,ycoord):
         
     Q = [f for f in s.data[0,:,ycoord,xcoord,:]]
     R = [f for f in s.data[1,:,ycoord,xcoord,:]]
-
+    S = []
+    W = []
 
     axes = axes.ravel()
     for i in range(axes.size-1):
@@ -87,6 +88,8 @@ def TriPolar(xcoord,ycoord):
         l2, = axes[i].plot(theta,R[i], color='tab:blue')
         l3, = axes[i].plot(theta,Q[i]+R[i], color='tab:red')
         axes[i].set_title(f'{w}nm')
+        S.append(np.sum(Q[i]+R[i]))
+        W.append(w)
     fig.legend((l1, l2,l3), (r'$\parallel$', r'$\perp$',r'$\parallel + \perp$'),
                'upper left',prop={'size': 15})
        
@@ -97,6 +100,8 @@ def TriPolar(xcoord,ycoord):
     
     fig.suptitle(f' \n X = {xcoord} \n Y = {ycoord}', fontsize=24)
     fig.tight_layout()
+    
+    return S, W
     
 #%%
     
@@ -134,4 +139,9 @@ def TriPolarNorm(xcoord,ycoord):
     [axi.set_xticks([0,np.pi/3,2*np.pi/3,np.pi,4*np.pi/3,5*np.pi/3]) for axi in axes.ravel()]
     fig.suptitle(f' \n X = {xcoord} \n Y = {ycoord}', fontsize=24)
     fig.tight_layout()
+
+
+#%%
+def IntPlot(xcoord,ycoord,W,S):
     
+    plt.plot(W,S)
