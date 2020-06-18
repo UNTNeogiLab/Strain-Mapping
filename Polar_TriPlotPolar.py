@@ -16,8 +16,8 @@ import hyperspy.api as hs
 
 
 
-def Polar(xcoord,ycoord, orientation, norm, file):
-    s = hs.load(file, lazy=True)
+def Polar(xmin,xmax,ymin,ymax, orientation, norm, file):
+    #s = hs.load(file, lazy=True)
     fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
                              int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
                              subplot_kw=dict(projection='polar'), 
@@ -25,9 +25,15 @@ def Polar(xcoord,ycoord, orientation, norm, file):
                              tight_layout=True)
     
     theta = np.radians(np.arange(0,360,2))
+    a = s.inav[ymin:ymax, xmin:xmax]
+    m = a.mean((0,1))
+    a = a.sum((0,1))
+    ycoord = (ymax - ymin) // 2
+    xcoord = (xmax - xmin) // 2
+    
     if orientation <=1:
         
-        Q = [f for f in s.data[orientation,:,ycoord,xcoord,:]]
+        Q = [f for f in a.data[orientation,:,ycoord,xcoord,:]]
         
         axes = axes.ravel()
         for i in range(axes.size-1):
@@ -43,8 +49,8 @@ def Polar(xcoord,ycoord, orientation, norm, file):
             axes[i].set_title(f'{w}nm')
     elif orientation == 2:
         
-        Q = [f for f in s.data[0,:,ycoord,xcoord,:]]
-        R = [f for f in s.data[1,:,ycoord,xcoord,:]]
+        Q = [f for f in a.data[0,:,:]]
+        R = [f for f in a.data[1,:,:]]
         axes = axes.ravel()
         for i in range(axes.size):
             w =  np.arange(780,922,2)
@@ -64,7 +70,7 @@ def Polar(xcoord,ycoord, orientation, norm, file):
 #%%
     
     
-def TriPolar(xcoord,ycoord):
+def TriPolar(xmin,xmax,ymin,ymax):
     fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
                              int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
                              subplot_kw=dict(projection='polar'), 
@@ -75,8 +81,14 @@ def TriPolar(xcoord,ycoord):
     theta = np.radians(np.arange(0,360,2))
     
         
-    Q = [f for f in s.data[0,:,ycoord,xcoord,:]]
-    R = [f for f in s.data[1,:,ycoord,xcoord,:]]
+    a = s.inav[ymin:ymax, xmin:xmax]
+    m = a.mean((0,1))
+    a = a.sum((0,1))
+    ycoord = (ymax - ymin) // 2
+    xcoord = (xmax - xmin) // 2
+    
+    Q = [f for f in a.data[0,:,:]]
+    R = [f for f in a.data[1,:,:]]
     S = []
     W = []
 
@@ -101,8 +113,51 @@ def TriPolar(xcoord,ycoord):
     fig.suptitle(f' \n X = {xcoord} \n Y = {ycoord}', fontsize=24)
     fig.tight_layout()
     
+    #fig2, ax2 = plt.plot(W,S)
+    #ax2.
     return S, W
+#%%
+def TriPolar2(xmin, xmax, ymin, ymax, fname):
+    fig, axes = plt.subplots(int(np.floor(np.sqrt(s.axes_manager[2].size))), 
+                             int(np.ceil(np.sqrt(s.axes_manager[2].size))), 
+                             subplot_kw=dict(projection='polar'), 
+                             sharex='all', sharey='all',
+                             tight_layout=True)
+
+
+    theta = np.radians(np.arange(0,360,2))
+
+    a = s.inav[ymin:ymax, xmin:xmax]
+    m = a.mean((0,1))
+    a = a.sum((0,1))
+    ycoord = (ymax - ymin) // 2
+    xcoord = (xmax - xmin) // 2
     
+    Q = [f for f in a.data[0,:,:]]
+    R = [f for f in a.data[1,:,:]]
+    S = []
+    W = []
+    axes = axes.ravel()
+    for i in range(axes.size):
+        w =  np.arange(780,924,4)
+        w = w[i]
+        l1, = axes[i].plot(theta,Q[i], color='tab:green')
+        l2, = axes[i].plot(theta,R[i], color='tab:blue')
+        l3, = axes[i].plot(theta,Q[i]+R[i], color='tab:red')
+        S.append(np.sum(Q[i]+R[i]))
+        W.append(w)
+    fig.legend((l1, l2,l3), (r'$\parallel$', r'$\perp$',r'$\parallel + \perp$'),
+               'upper left',prop={'size': 15})
+    
+    
+    
+    [axi.set_rticks([]) for axi in axes.ravel()]
+    [axi.set_xticks([0,np.pi/3,2*np.pi/3,np.pi,4*np.pi/3,5*np.pi/3]) for axi in axes.ravel()]
+    
+    fig.suptitle(f' \n X = {xcoord} \n Y = {ycoord}', fontsize=24)
+    fig.tight_layout()
+    plt.savefig(str(fname))
+    return S, W
 #%%
     
     
@@ -138,6 +193,7 @@ def TriPolarNorm(xcoord,ycoord):
     [axi.set_rticks([]) for axi in axes.ravel()]
     [axi.set_xticks([0,np.pi/3,2*np.pi/3,np.pi,4*np.pi/3,5*np.pi/3]) for axi in axes.ravel()]
     fig.suptitle(f' \n X = {xcoord} \n Y = {ycoord}', fontsize=24)
+    axes.tight_layout()
     fig.tight_layout()
 
 
